@@ -21,5 +21,5 @@ class Base(DeclarativeBase, AsyncAttrs):
     )
 
     @declared_attr.directive
-    def tablename(cls) -> str:
-        return cls.name.lower() + "s"
+    def __tablename__(cls) -> str:
+        return cls.__name__.lower() + "s"

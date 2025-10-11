@@ -15,9 +15,3 @@ class Author(Base):
     pseodunym: Mapped[str] = mapped_column(String(255), unique=True, nullable=True)
     description: Mapped[str] = mapped_column(Text, nullable=True)
     image: Mapped[str] = mapped_column(String(255), nullable=True)
-
-    @event.listens_for(Author, "before_insert")
-    @event.listens_for(Author, "before_update")
-    def generate_slug(Mapper, connection, target):
-        if target.name:
-            target.slug = slugify(target.name, lowercase=True)

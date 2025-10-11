@@ -15,9 +15,3 @@ class Publisher(Base):
     another_name: Mapped[str] = mapped_column(String, unique=True, nullable=True)
     description: Mapped[str] = mapped_column(Text, nullable=True)
     image: Mapped[str] = mapped_column(String(255), nullable=True)
-
-    @event.listens_for(Publisher, "before_insert")
-    @event.listens_for(Publisher, "before_update")
-    def generate_slug(mapper, connection, target):
-        if target.name:
-            target.slug = slugify(target.name, lowercase=True)

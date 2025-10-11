@@ -2,7 +2,7 @@ from sqlalchemy.orm import Mapped, mapped_column, validates
 from sqlalchemy import ForeignKey, Text, event, Integer, String
 from sqlalchemy.dialects.postgresql import UUID
 from backend.src.database import Base
-from sql_enum import *
+from backend.src.sql_enum import *
 import uuid
 import slugify
 
@@ -21,12 +21,6 @@ class Title(Base):
     type: Mapped[TypeEnum] = mapped_column(default="manga")
     status: Mapped[StatusEnum] = mapped_column(default="ongoing")
     release_format: Mapped[ReleaseEnum] = mapped_column(nullable=True)
-
-    @event.listens_for(Title, "before_insert")
-    @event.listens_for(Title, "before_update")
-    def generate_slug(mapper, connection, target):
-        if target.title:
-            target.slug = slugify(target.title, lowercase=True)
 
     @validates("release_year")
     def validate_release_year(self, key, year):

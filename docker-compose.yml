@@ -4,7 +4,7 @@ services:
     container_name: db
     restart: always
     ports:
-      - "5433:5432"
+      - "5432:5432"
     env_file:
       - .env
     volumes:
@@ -17,6 +17,7 @@ services:
       - .env
     ports:
       - "8000:8000"
+    container_name: backend
     depends_on:
       - db
 
