@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import ForeignKey, Text, event, Integer, String
+from sqlalchemy import ForeignKey, Text, event, Integer, String, inspect
 from sqlalchemy.dialects.postgresql import UUID
 from backend.src.database import Base
 import uuid
@@ -14,7 +14,18 @@ class Publisher(Base):
     slug: Mapped[str] = mapped_column(String(255), unique=True)
     another_name: Mapped[str] = mapped_column(String, unique=True, nullable=True)
     description: Mapped[str] = mapped_column(Text, nullable=True)
-    image: Mapped[str] = mapped_column(String(255), nullable=True)
+    image: Mapped[str] = mapped_column(String(2048), nullable=True)
     titles: Mapped[list["Title"]] = relationship(
         "Title", back_populates="publisher", cascade="all, delete-orphan"
     )
+
+@event.listens_for(Publisher, 'before_insert')
+def generate_slug(mapper, connection, target):
+    if target.name:
+        target.slug = slugify(target.name)
+
+@event.listens_for(Publisher, 'before_update')
+def update_slug(mapper, connection, target):
+    field = inspect(target)
+    if field.attrs.name.history.has_changes():
+        target.slug = slugify(target.name)
