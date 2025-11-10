@@ -1,5 +1,6 @@
 from datetime import datetime
 from sqlalchemy import func
+from functools import wraps
 from sqlalchemy.orm import DeclarativeBase, declared_attr, Mapped, mapped_column
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncAttrs, async_sessionmaker
 
@@ -11,6 +12,16 @@ engine = create_async_engine(DATABASE_URL)
 
 async_session_marker = async_sessionmaker(engine, expire_on_commit=False)
 
+def connections(method):
+    @wraps(method)
+    async def wrapper(*args, **kwargs):
+        async with async_session_marker() as session:
+            try:
+                return await method(*args, **kwargs, session=session)
+            except Exception as e:
+                await session.rollback()
+                raise e
+    return wrapper
 
 class Base(DeclarativeBase, AsyncAttrs):
     abstract = True
