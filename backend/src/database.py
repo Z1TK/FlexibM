@@ -12,7 +12,7 @@ engine = create_async_engine(DATABASE_URL)
 
 async_session_marker = async_sessionmaker(engine, expire_on_commit=False)
 
-def connections(method):
+def connection(method):
     @wraps(method)
     async def wrapper(*args, **kwargs):
         async with async_session_marker() as session:

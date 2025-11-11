@@ -4,7 +4,7 @@ from backend.src.sql_enum import *
 import uuid
 from typing import Annotated
 
-class AuthorSchema(BaseModel):
+class AuthorCreateSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     name: Annotated[str, Field(String(255))]
@@ -12,7 +12,12 @@ class AuthorSchema(BaseModel):
     description: Annotated[str | None, Field(Text())]
     image: Annotated[str | None, Field(String(2048))]
 
-class PublisherSchema(BaseModel):
+class AuthorReadSchema(AuthorCreateSchema):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: Annotated[uuid.UUID, Field()]
+
+class PublisherCreateSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     name: Annotated[str, Field(String(255))]
@@ -20,7 +25,12 @@ class PublisherSchema(BaseModel):
     description: Annotated[str | None, Field(Text())]
     image: Annotated[str | None, Field(String(2048))]
 
-class TitleSchema(BaseModel):
+class PublisherReadSchema(PublisherCreateSchema):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: Annotated[uuid.UUID, Field()]
+
+class TitleCreateSchema(BaseModel):
     model_config = ConfigDict(
         from_attributes=True,
         use_enum_values=True
@@ -38,3 +48,11 @@ class TitleSchema(BaseModel):
     publisher_id: Annotated[uuid.UUID, Field()] 
     genres: Annotated[list[int], Field()]
     tags: Annotated[list[int], Field()]
+
+class TitleReadSchema(TitleCreateSchema):
+    model_config = ConfigDict(
+        from_attributes=True,
+        use_enum_values=True
+    )
+
+    id: Annotated[uuid.UUID, Field()]
