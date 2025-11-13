@@ -1,7 +1,6 @@
 from fastapi import APIRouter, HTTPException, Query, status
 from fastapi.responses import JSONResponse
 from typing import Annotated
-from sqlalchemy.ext.asyncio import AsyncSession
 from backend.src.dao.dao import AuthorDAO
 from backend.src.schemas import AuthorCreateSchema, AuthorReadSchema
 

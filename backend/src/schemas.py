@@ -56,3 +56,19 @@ class TitleReadSchema(TitleCreateSchema):
     )
 
     id: Annotated[uuid.UUID, Field()]
+
+class GenreReadSchema(BaseModel):
+    model_config = ConfigDict(
+        from_attributes=True
+    )
+
+    id: Annotated[int, Field()]
+    name: Annotated[str, Field(String(255))]
+
+class TagReadSchema(BaseModel):
+    model_config = ConfigDict(
+        from_attributes=True
+    )
+    
+    id: Annotated[int, Field()]
+    name: Annotated[str, Field(String(255))]

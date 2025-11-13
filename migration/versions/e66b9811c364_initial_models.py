@@ -10,6 +10,8 @@ from typing import Sequence, Union
 from alembic import op
 import sqlalchemy as sa
 
+import os
+
 
 # revision identifiers, used by Alembic.
 revision: str = 'e66b9811c364'
@@ -81,6 +83,19 @@ def upgrade() -> None:
     sa.UniqueConstraint('alternative_title'),
     sa.UniqueConstraint('slug')
     )
+    
+    current_dir = os.path.dirname(__file__)
+    sql_path = os.path.abspath(os.path.join(current_dir, '../../'))
+    genre_sql = os.path.join(sql_path, 'sql_injection', 'genres.sql')
+    tag_sql = os.path.join(sql_path, 'sql_injection', 'tags.sql')
+
+    with open(genre_sql, encoding='utf-8') as f:
+        genres = f.read()
+        op.execute(genres)
+
+    with open(tag_sql, encoding='utf-8') as f:
+        tags = f.read()
+        op.execute(tags)
     # ### end Alembic commands ###
 
 
