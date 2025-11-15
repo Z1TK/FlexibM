@@ -44,11 +44,11 @@ class Title(Base):
 
 @event.listens_for(Title, 'before_insert')
 def generate_slug(mapper, connection, target):
-    if target.name:
-        target.slug = slugify(target.name)
+    if target.title:
+        target.slug = slugify(target.title)
 
 @event.listens_for(Title, 'before_update')
 def update_slug(mapper, connection, target):
     field = inspect(target)
-    if field.attrs.name.history.has_changes():
-        target.slug = slugify(target.name)
+    if field.attrs.title.history.has_changes():
+        target.slug = slugify(target.title)

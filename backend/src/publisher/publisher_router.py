@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Query, status
 from fastapi.responses import JSONResponse
 from typing import Annotated
 from backend.src.dao.dao import PublisherDAO
-from backend.src.schemas import PublisherCreateSchema, PublisherReadSchema
+from backend.src.schemas import PublisherCreateSchema, PublisherReadSchema, PublisherUpdateSchema
 
 publisher_router = APIRouter(prefix='/publishers')
 
@@ -35,8 +35,8 @@ async def add_publisher(
         return res
 
 
-@publisher_router.patch("{publisher_id}")
-async def update_publisher(publisher_data: PublisherCreateSchema, publisher_id: str):
+@publisher_router.patch("/{publisher_id}")
+async def update_publisher(publisher_data: PublisherUpdateSchema, publisher_id: str):
     publisher = await PublisherDAO.update_by_id(model_id=publisher_id, values=publisher_data)
     if publisher:
         res = PublisherReadSchema.model_validate(publisher).model_dump()

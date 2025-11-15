@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Query, status
 from fastapi.responses import JSONResponse
 from typing import Annotated
 from backend.src.dao.dao import AuthorDAO
-from backend.src.schemas import AuthorCreateSchema, AuthorReadSchema
+from backend.src.schemas import AuthorCreateSchema, AuthorReadSchema, AuthorUpdateSchema
 
 author_router = APIRouter(prefix="/authors")
 
@@ -36,8 +36,8 @@ async def add_author(
         return res
 
 
-@author_router.patch("{author_id}")
-async def update_author(author_data: AuthorCreateSchema, author_id: str):
+@author_router.patch("/{author_id}")
+async def update_author(author_data: AuthorUpdateSchema, author_id: str):
     author = await AuthorDAO.update_by_id(model_id=author_id, values=author_data)
     if author:
         res = AuthorReadSchema.model_validate(author).model_dump()

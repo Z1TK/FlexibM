@@ -2,11 +2,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update, delete
 from pydantic import BaseModel
 from fastapi import HTTPException
+from uuid import UUID
 from backend.src.database import connection
+from backend.src.database import Base
 
 
-class BaseDAO:
-    model = None
+class BaseDAO[T: Base]:
+    model: type[T]
 
     @classmethod
     @connection
@@ -23,6 +25,14 @@ class BaseDAO:
         result = await session.execute(query)
         info_one = result.scalar_one_or_none()
         return info_one
+
+    @classmethod
+    @connection
+    async def get_by_ids(cls, session: AsyncSession, ids: list[int]):
+        query = select(cls.model).where(cls.model.id.in_(ids))
+        result = await session.execute(query)
+        ids = result.scalars().all()
+        return ids
 
     @classmethod
     @connection
