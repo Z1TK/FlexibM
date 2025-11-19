@@ -6,7 +6,7 @@ from backend.src.genre.model import Genre
 from backend.src.title.model import Title
 from backend.src.database import connection
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.orm import selectinload
 from pydantic import BaseModel
 
@@ -14,13 +14,63 @@ from pydantic import BaseModel
 class AuthorDAO(BaseDAO[Author]):
     model = Author
 
+    @classmethod
+    @connection
+    async def get_author_title(cls, session: AsyncSession, model_id: int | str):
+        query = select(cls.model).options(selectinload(cls.model.titles)).filter_by(id=model_id)
+        result = await session.execute(query)
+        info_one = result.scalar_one_or_none()
+        return info_one
+
 
 class PublisherDAO(BaseDAO[Publisher]):
     model = Publisher
 
+    @classmethod
+    @connection
+    async def get_publisher_title(cls, session: AsyncSession, model_id: int | str):
+        query = select(cls.model).options(selectinload(cls.model.titles)).filter_by(id=model_id)
+        result = await session.execute(query)
+        info_one = result.scalar_one_or_none()
+        return info_one
 
 class TitleDAO(BaseDAO[Title]):
     model = Title
+
+    @classmethod
+    @connection
+    async def get_all(
+        cls,
+        session: AsyncSession,
+        type: str,
+        status: str,
+        release_format: str,
+        genres: list[int],
+        tags: list[int],
+        page: int,
+        limit: int,
+    ):
+        query = select(cls.model)
+
+        if type:
+            query = query.where(cls.model.type == type)
+
+        if status:
+            query = query.where(cls.model.status == status)
+
+        if release_format:
+            query = query.where(cls.model.release_format == release_format)
+
+        if genres:
+            query = query.where(cls.model.genres.any(Genre.id.in_(genres)))
+
+        if tags:
+            query = query.where(cls.model.tags.any(Tag.id.in_(tags)))
+
+        query = query.offset((page - 1) * limit).limit(limit)
+        result = await session.execute(query)
+        info_all = result.scalars().all()
+        return info_all
 
     @classmethod
     @connection
@@ -69,7 +119,6 @@ class TitleDAO(BaseDAO[Title]):
             await session.rollback()
             raise e
         return new_title
-
 
 class TagDAO(BaseDAO[Tag]):
     model = Tag

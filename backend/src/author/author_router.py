@@ -2,7 +2,12 @@ from fastapi import APIRouter, HTTPException, Query, status
 from fastapi.responses import JSONResponse
 from typing import Annotated
 from backend.src.dao.dao import AuthorDAO
-from backend.src.schemas import AuthorCreateSchema, AuthorReadSchema, AuthorUpdateSchema
+from backend.src.schemas import (
+    AuthorCreateSchema,
+    AuthorReadSchema,
+    AuthorUpdateSchema,
+    AuthorIdSchema,
+)
 
 author_router = APIRouter(prefix="/authors")
 
@@ -19,9 +24,9 @@ async def get_all(
 
 @author_router.get("/{author_id}")
 async def get_by_id(author_id: str):
-    author = await AuthorDAO.get_by_id(model_id=author_id)
+    author = await AuthorDAO.get_author_title(model_id=author_id)
     if author:
-        res = AuthorReadSchema.model_validate(author).model_dump()
+        res = AuthorIdSchema.model_validate(author).model_dump()
         return res
     raise HTTPException(status_code=404, detail="Author not found")
 

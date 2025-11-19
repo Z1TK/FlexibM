@@ -16,8 +16,21 @@ title_router = APIRouter(prefix="/titles")
 async def get_all(
     page: Annotated[int, Query(ge=1)] = 1,
     limit: Annotated[int, Query(ge=1, le=100)] = 10,
+    type: Annotated[str | None, Query()] = None,
+    status: Annotated[str | None, Query()] = None,
+    release_format: Annotated[str | None, Query()] = None,
+    genres: Annotated[list[int] | None, Query()] = None,
+    tags: Annotated[list[int] | None, Query()] = None,
 ):
-    titles = await TitleDAO.get_all(page=page, limit=limit)
+    titles = await TitleDAO.get_all(
+        page=page,
+        limit=limit,
+        type=type,
+        status=status,
+        genres=genres,
+        tags=tags,
+        release_format=release_format,
+    )
     res = [TitleReadAllSchema.model_validate(title).model_dump() for title in titles]
     return res
 
@@ -34,7 +47,9 @@ async def get_by_id(title_id: int):
 @title_router.post("")
 async def add(title_data: TitleCreateSchema):
     title = await TitleDAO.add(values=title_data)
-    return title
+    if title:
+        res = TitleReadIDSchema.model_validate(title).model_dump()
+        return res
 
 
 @title_router.patch("/{title_id}")
@@ -43,10 +58,10 @@ async def update_title(title_data: TitleUpdateSchema, title_id: int):
     return title
 
 
-# @title_router.delete("")
-# async def delete_title(title_ids: list[int]):
-#     await TitleDAO.delete_one_or_many(model_ids=title_ids)
-#     return JSONResponse(
-#         status_code=status.HTTP_200_OK,
-#         content={"detail": "The deletion was successful."},
-#     )
+@title_router.delete("")
+async def delete_title(title_ids: list[int]):
+    await TitleDAO.delete_one_or_many(model_ids=title_ids)
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={"detail": "The deletion was successful."},
+    )

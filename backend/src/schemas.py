@@ -4,13 +4,20 @@ import uuid
 from typing import Annotated
 
 
+class TitleReadAllSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: Annotated[int, Field()]
+    title: Annotated[str, Field(max_length=255)]
+    cover: Annotated[str, Field(max_length=255)]
+
 class AuthorCreateSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     name: Annotated[str, Field(max_length=255)]
-    pseodunym: Annotated[str | None, Field(max_length=255)]
-    description: Annotated[str | None, Field()]
-    image: Annotated[str | None, Field(max_length=2048)]
+    pseodunym: Annotated[str | None, Field(max_length=255, default=None)]
+    description: Annotated[str | None, Field(default=None)]
+    image: Annotated[str | None, Field(max_length=2048, default=None)]
 
 class AuthorUpdateSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -25,6 +32,10 @@ class AuthorReadSchema(AuthorCreateSchema):
 
     id: Annotated[uuid.UUID, Field()]
 
+class AuthorIdSchema(AuthorReadSchema):
+    model_config = ConfigDict(from_attributes=True)
+
+    titles: list[TitleReadAllSchema]
 
 class AuthorTitleSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -37,9 +48,9 @@ class PublisherCreateSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     name: Annotated[str, Field(max_length=255)]
-    another_name: Annotated[str | None, Field(max_length=255)]
-    description: Annotated[str | None, Field()]
-    image: Annotated[str | None, Field(max_length=2048)]
+    another_name: Annotated[str | None, Field(max_length=255, default=None)]
+    description: Annotated[str | None, Field(default=None)]
+    image: Annotated[str | None, Field(max_length=2048, default=None)]
 
 class PublisherUpdateSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -54,6 +65,10 @@ class PublisherReadSchema(PublisherCreateSchema):
 
     id: Annotated[uuid.UUID, Field()]
 
+class PublisherIdschema(PublisherReadSchema):
+    model_config = ConfigDict(from_attributes=True)
+
+    titles: list[TitleReadAllSchema]
 
 class PublisherTitleSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -81,7 +96,7 @@ class TitleCreateSchema(BaseModel):
 
     title: Annotated[str, Field(max_length=255)]
     description: Annotated[str, Field()]
-    alternative_title: Annotated[str | None, Field(max_length=255)]
+    alternative_title: Annotated[str | None, Field(max_length=255, default=None)]
     cover: Annotated[str, Field(max_length=255)]
     release_year: Annotated[int, Field()]
     type: Annotated[TypeEnum, Field()]
@@ -110,15 +125,6 @@ class TitleReadIDSchema(BaseModel):
     genres: list[GenreReadSchema]
     tags: list[TagReadSchema]
 
-
-class TitleReadAllSchema(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
-    id: Annotated[int, Field()]
-    title: Annotated[str, Field(max_length=255)]
-    cover: Annotated[str, Field(max_length=255)]
-
-
 class TitleUpdateSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 
@@ -132,5 +138,5 @@ class TitleUpdateSchema(BaseModel):
     release_format: Annotated[ReleaseEnum | None, Field()] = None
     author_id: Annotated[uuid.UUID | None, Field()] = None
     publisher_id: Annotated[uuid.UUID | None, Field()] = None
-    genres: Annotated[list[int] | None, Field()] = None
-    tags: Annotated[list[int] | None, Field()] = None
+    # genres: Annotated[list[int] | None, Field()] = None
+    # tags: Annotated[list[int] | None, Field()] = None
